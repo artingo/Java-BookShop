@@ -1,10 +1,12 @@
 package onlineshop.controllers;
 
-import onlineshop.*;
+import onlineshop.Billing;
+import onlineshop.Cart;
+import onlineshop.Customer;
+import onlineshop.Shop;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,9 +37,9 @@ public class OrderController extends BaseController {
 
     @GetMapping(value = "/{orderNumber}")
     public String showOrder(Model view, @PathVariable(name="orderNumber") Integer orderNumber) {
+        loadCartItems(view);
         // TODO: show details of order with {orderNumber}
         // 1. get order with 'orderNumber
-        getCartItems(view);
         view.addAttribute("orderItems", cart.getItems());
         return "order";
     }
@@ -45,7 +47,6 @@ public class OrderController extends BaseController {
     @GetMapping(value = "/all")
     public String listOrders(Model view) {
         // TODO: list all orders of the current customer
-        getCartItems(view);
         return "order-list";
     }
 }

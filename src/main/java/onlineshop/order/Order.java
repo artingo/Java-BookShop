@@ -1,6 +1,6 @@
-package onlineshop;
+package onlineshop.order;
 
-import onlineshop.merchandise.OrderItem;
+import onlineshop.Billing;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -35,4 +35,8 @@ public class Order {
     }
 
     // TODO: generate Getters/Setters
+
+    public Integer getOrderNo() {
+        return orderNo;
+    }
 }

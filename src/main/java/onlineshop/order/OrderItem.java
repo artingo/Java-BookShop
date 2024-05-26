@@ -1,4 +1,6 @@
-package onlineshop.merchandise;
+package onlineshop.order;
+
+import onlineshop.merchandise.CartItem;
 
 public class OrderItem extends CartItem {
     private double discount;
