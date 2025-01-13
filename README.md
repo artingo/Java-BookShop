@@ -10,46 +10,31 @@ This is how the final shop looks like:
 
 Follow these steps to implement the bookshop:
 ## 1. Create project
-1. In your IDE, create a new Spring Initializr project:<br/>
-   ![Spring Initializr](src/main/resources/screenshots/initializr.png)
-  
+1. In your IDE, create a new Spring Boot project:<br/>
+   ![Spring Boot](src/main/resources/screenshots/new-project.png)
+1. On the next screen, select the following dependencies:
+   * DevTools (for instant refresh)
+   * Mustache (as templating engine for interactive HTML pages)
+   * Spring Web (to add the Tomcat webserver)<br/>
 
-1. Wait until all files and folders are created. After that, add these dependencies to your [pom.xml](pom.xml) file: 
-   ```xml
-   <dependencies>
-      <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-mustache</artifactId>
-         <version>3.2.1</version>
-      </dependency>
-      <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-web</artifactId>
-         <version>3.2.1</version>
-      </dependency>
-      <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-devtools</artifactId>
-         <version>3.2.1</version>
-      </dependency>
-   </dependencies>
-   ```
+   ![Spring Dependencies](src/main/resources/screenshots/spring-dependencies.png)
+1. Wait until all files and folders are created.
    
-2. In your [application.properties](src/main/resources/application.properties), add the app name and set the Mustache file suffix to `html`:
+1. In your [application.properties](src/main/resources/application.properties), set the Mustache file suffix to `html`:
    ```properties
    spring.application.name=Book Shop
    spring.mustache.suffix=.html
    ```
 
-## 2. Add static resources  
-1. Under the [resources](src/main/resources) directory, create this folder structure for static web files:<br/>
-   ![static folder](src/main/resources/screenshots/resources.png)
-  
+## 2. Find a HTML template
+1. Go to a template portal, e.g. [TemplatesJungle](https://templatesjungle.com/ecommerce/), and select a proper HTML template for your shop.
+1. Klick the [download](https://templatesjungle.gumroad.com/l/electrostore-bootstrap-html-template) button and continue to checkout.
+1. Open the ZIP file in your "Downloads" folder and extract it to your [resources/static](src/main/resources/static) directory, including subdirectories.
 
-1. Under the [static](src/main/resources/static) directory, add the HTML file templates. Add the other static files (CSS, scripts, fonts), as well.<br/>
+## 3. Add static resources  
+1. Your [static](src/main/resources/static) folder structure should look similar to this, now:<br/>
    ![static HTML files](src/main/resources/screenshots/static_html.png)  
   
-
 1. In the [Shop](src/main/java/onlineshop/Shop.java) class, start the Spring Boot server.
    ```java
    @SpringBootApplication
@@ -59,15 +44,34 @@ Follow these steps to implement the bookshop:
       }
    }
    ```
-   Open this URL in your Browser: http://localhost:8080 <br/>
+1. Open this URL in your Browser: http://localhost:8080 <br/>
    Your static [start page](http://localhost:8080/index.html) should appear.
 
-## 3. Split the pages into partials
+## 3. Create a Controller
+1. Create a Controller class named [ShopController.java](src/main/java/onlineshop/controllers/ShopController.java)
+2. Give it a `@Controller` annotation.
+3. Add a method to handle the root URL: "/"
+4. Add a method to handle `.html` URLs. The result should look like this:
+   ```java
+   @Controller
+   public class ShopController {
+        @GetMapping(value = {"/"})
+        public String root(Model model) {
+            return "redirect:/index.html";
+        }
+   
+        @GetMapping(value = {"/{name}.html"})
+        public String htmlMapping(@PathVariable String name, HttpSession session) {
+            return name;
+        }
+   }
+   ```
+## 4. Make static HTML pages dynamic
 1. Under the [resources](src/main/resources) directory, create a [templates](src/main/resources/templates) folder.
-2. Move the [index.html](src/main/resources/static/index.html) file from [static](src/main/resources/static) to the new [templates](src/main/resources/templates) folder.
-3. Under templates, create a [partials](src/main/resources/templates/partials) folder. Your folder structure should look like this, now:
-
-4. From the [index.html](src/main/resources/templates/index.html) file, cut out part of the HTML head section and paste it to a new [htmlHead.html](src/main/resources/templates/partials/htmlHead.html) file in partials:
+1. Move all HTML files from [static](src/main/resources/static) to [templates](src/main/resources/templates) folder.
+1. Restart the web server ([http://localhost:8080](http://localhost:8080)) and test whether the HTML page links still work properly.
+1. Under [templates](src/main/resources/templates), create a [partials](src/main/resources/templates/partials) folder.
+1. From the [index.html](src/main/resources/templates/index.html) file, cut out part of the HTML head section and paste it into a new [partials/htmlHead.html](src/main/resources/templates/partials/htmlHead.html) file:
    ```html
    <meta charset="utf-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -79,8 +83,7 @@ Follow these steps to implement the bookshop:
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    ```
-
-5. In the [index](src/main/resources/templates/index.html) file, create a reference to the freshly create [htmlHead](src/main/resources/templates/partials/htmlHead.html) file.
+1. In the [index](src/main/resources/templates/index.html) file, create a reference to the freshly created [htmlHead](src/main/resources/templates/partials/htmlHead.html) file.
    ```handlebars
    <!DOCTYPE html>
    <html lang="end">
@@ -89,11 +92,11 @@ Follow these steps to implement the bookshop:
        {{> partials/htmlHead }}
    </head>
    ```
-6. Repeat these steps for [header](src/main/resources/templates/partials/header.html), [footer](src/main/resources/templates/partials/footer.html) and other page sections.
+1. Repeat these steps for [header](src/main/resources/templates/partials/header.html), [footer](src/main/resources/templates/partials/footer.html) and other page sections.
 
-7. Your file structure should look like this, now:<br/>
+1. Your file structure should look similar to this, now:<br/>
    ![partials](src/main/resources/screenshots/partials.png)
-8. Your HTML file should look like this:
+1. Your HTML file should look like this:
    ```handlebars
    <!DOCTYPE html>
    <html lang="en">
@@ -113,46 +116,62 @@ Follow these steps to implement the bookshop:
    </body>
    </html>
    ```
-9. Repeat these steps for all other HTML files: move them to the [templates](src/main/resources/templates) folder and replace their partials code by Mustache templates. No HTML files should remain in the [static](src/main/resources/static) folder.
-  
-## 4. Create a Controller
-1. Create a Controller class named [ShopController.java](src/main/java/onlineshop/controllers/ShopController.java)
-2. Give it a `@Controller` annotation.
-3. Add a method to handle the root URL: "/"
-4. Add a method to handle `.html` URLs. The result should look like this:
+1. Repeat these steps for all other HTML files: replace their partials code by Mustache templates.
+
+## 5. Create model classes
+1. In the [merchandise](src/main/java/onlineshop/merchandise) folder, create an [Article.java](src/main/java/onlineshop/merchandise/Article.java) class.
+1. It should contain the basic article fields:
    ```java
-   @Controller
-   public class ShopController {
-        @GetMapping(value = {"/"})
-        public String root(Model model) {
-            return "redirect:/index.html";
-        }
-   
-        @GetMapping(value = {"/{name}.html"})
-        public String htmlMapping(@PathVariable String name, HttpSession session) {
-            return name;
-        }
+   public class Article {
+     /** Unique article number */
+     protected int articleNo;
+     /** Display-title of this Article */
+     protected String title;
+     /** Manufacturer of this Article */
+     protected String manufacturer;
+     /** Shop price */
+     protected double price;
+     /** URL to the image */
+     protected String image;
+     ...
    }
    ```
-
-## 5. Import and display articles
+1. Also, create a [Book](src/main/java/onlineshop/merchandise/Book.java) class containing following fields:
+   ```java
+   public class Book extends Article {
+     protected int pages;
+     protected String author;
+     protected Format format;
+     protected Genre genre;
+     ...
+   }
+   ```
+## 6. Import and display articles
 1. In the [resources](src/main/resources) directory, create a [CSV file](src/main/resources/books.csv) containing a list of articles or books. It could look like this:
    ```
    Title;Author;Genre;Pages;Publisher;Price;Image
    God Created the Integers;Hawking, Stephen;mathematics;197;Penguin;24,50;https://m.media-amazon.com/images/I/71HKbmRoVmL._AC_UY218_.jpg
    ```
-2. In the  [Shop](src/main/java/onlineshop/Shop.java) class, create a `readArticles()` method that will read a CSV file and fill a [Book](src/main/java/onlineshop/merchandise/Book.java) list from it. Pass the `fileName` and `List` as parameters:
+1. To facilitate the import of CSV files, add “commons-csv” to the dependencies in the [pom.xml](pom.xml):
+   ```xml
+   <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>1.10.0</version>
+   </dependency>
+   ```
+1. In the  [Shop](src/main/java/onlineshop/Shop.java) class, create a `readArticles()` method that will read a CSV file and fill a [Book](src/main/java/onlineshop/merchandise/Book.java) list from it. Pass the `fileName` and `List` as parameters:
    ```java
    private static void readArticles(String fileName, List<Book> books) { ... }
    ```
    
-3. Create a getter method so that we can access the article list from outside.
+1. Create a getter method so that we can access the article list from outside.
    ```java
    public static List<Book> getArticles() {
         return books;
    }
    ```
-4. In [ShopController.homePage()](src/main/java/onlineshop/controllers/ShopController.java#L28), load the article list and pass it to the view model.
+1. In [ShopController.homePage()](src/main/java/onlineshop/controllers/ShopController.java#L28), load the article list and pass it to the view model.
    ```java
    @GetMapping(value = {"/index.html"})
    public String homePage(Model model) {
@@ -160,7 +179,7 @@ Follow these steps to implement the bookshop:
         return "index";
    }
    ```
-5. In the [index.html](src/main/resources/templates/index.html) template, iterate over the `articles`. Integrate the article fields in the proper HTML code section.
+1. In the [index.html](src/main/resources/templates/index.html) template, iterate over the `articles`. Integrate the article fields in the proper HTML code section.
    ```handlebars
    <div class="row product-content product-store">
      {{#articles}}
@@ -183,10 +202,10 @@ Follow these steps to implement the bookshop:
      {{/articles}}
    </div>
    ```
-6. Check the result in your browser. The dynamic articles from the CSV file should appear on your homepage: http://localhost:8080. The result should look like this:<br/>
+1. Check the result in your browser. The dynamic articles from the CSV file should appear on your homepage: http://localhost:8080. The result should look like this:<br/>
    ![Book list](src/main/resources/screenshots/book-list.png)
 
-## 6. Implement the cart functionality
+## 7. Implement the cart functionality
 ### Add a CartItem class
 1. To be able to add multiple copies of an item to the shopping cart, we need to extend the article or book class. To do this, we create a new [CartItem](src/main/java/onlineshop/merchandise/CartItem.java) class in the [merchandise](src/main/java/onlineshop/merchandise) package, which inherits from Book. 
 2. Add a `quantity` field and generate a getter and setter for it.
@@ -399,7 +418,7 @@ Follow these steps to implement the bookshop:
 7. The card page should be fully functional, now, and look similar to this:<br/>
    ![cart page](src/main/resources/screenshots/cart-page.png)
 
-## 7. Handle pagination on the overview page
+## 8. Handle pagination on the overview page
 Now, we can see all 209 books from the [CSV file](src/main/resources/books.csv) but these are too many entries at once. To handle this, we introduce a `pagination`, i.e. show only 15 books at once and offer a navigation to the next / previous page.
 
 ### Control pagination via request parameter
@@ -480,7 +499,7 @@ As Mustache doesn't handle logic, we have to implement it in the controller.
    ![Pagination screenshot](src/main/resources/screenshots/pagination.png)   
 5. Test the proper pagination by clicking the links!
 
-## 8. Handle sorting on the overview page
+## 9. Handle sorting on the overview page
 ### Create an Enum for Sorting
 It is very sensible to use an `Enum` for the sorting selection list. This allows us to display it in the frontend and react to the transmitted parameters in the backend. We have already used named enums for genres, book format and gender.
 1. So we create a new `Enum` class called [Sorting.java](src/main/java/onlineshop/enums/Sorting.java) in the [enums](src/main/java/onlineshop/enums) directory.
@@ -625,7 +644,7 @@ The last step is to trigger the change the search parameters in the URL as soon 
 4. Congratulations! Now it's time to thoroughly test the sorting in your browser!<br/>
    ![sorted-by-price.png](src/main/resources/screenshots/sorted-by-price.png)
 
-## 9. Checkout functionality
+## 10. Checkout functionality
 ### List the cart items
 1. Add a new `checkout()` method that prepares the view model for the checkout page. Calculate all necessary fields.
    ```java
